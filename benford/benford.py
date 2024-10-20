@@ -1921,3 +1921,35 @@ def second_order(data, test, decimals=2, sign='all', verbose=True, MAD=False,
                              limit_N=limit_N, MSE=MSE, show_plot=show_plot,
                              save_plot=save_plot, save_plot_kwargs=save_plot_kwargs)
     return data
+def ks(data, test, decimals=2, sign='all', verbose=False):
+    """Calculates the Kolmogorov-Smirnov test of the Series
+
+    Args:
+        data: sequence of numbers to be evaluated. Must be a numpy 1D array,
+            a pandas Series or a pandas DataFrame column, with values being
+            integers or floats.
+        test: informs which base test to use for the ks.
+        decimals: number of decimal places to consider. Defaluts to 2.
+            If integers, set to 0. If set to -infer-, it will remove the zeros
+            and consider up to the fifth decimal place to the right, but will
+            loose performance.
+        sign: tells which portion of the data to consider. pos: only the positive
+            entries; neg: only negative entries; all: all entries but zeros.
+            Defaults to all.
+
+    Returns:
+        tuple: the Suprem, which is the greatest absolute difference between the
+        foudnd and the expected proportions, and the Kolmogorov-Smirnov critical
+        value according to the confidence level, for comparison
+    """
+    data = _check_num_array_(data)
+    test = _check_test_(test)
+    start = Source(data, sign=sign, decimals=decimals, verbose=verbose)
+    if test in [1, 2, 3]:
+        start.first_digits(digs=test, confidence=95,  KS=True, simple=True)
+    elif test == 22:
+        start.second_digit(confidence=95, KS=True, simple=True)
+    else:
+        start.last_two_digits(confidence=95, KS=True, simple=True)
+    return start.KS
+
